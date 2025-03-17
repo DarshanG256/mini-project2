@@ -2,7 +2,6 @@
 {% load widget_tweaks %}
 {% block content %}
 
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -37,9 +36,7 @@
         background:#57717d;
       }
   
-  
       .card {
-        
         -webkit-box-shadow: 0 1px 2.94px 0.06px rgba(4, 26, 55, 0.16);
         box-shadow: 0 1px 2.94px 0.06px rgba(4, 26, 55, 0.16);
         margin-bottom: 30px;
@@ -62,53 +59,60 @@
       .f-right {
         float: right;
       }
+
       header {
-      left: 0px;
-      right: 0px;
-    }
+        left: 0px;
+        right: 0px;
+      }
     </style>
-  </head>
+</head>
 <br><br>
 
-  <div class="container">
+<div class="container">
     <div class="row">
-      
-        <div class="col-md-4 col-xl-4">
+        <div class="col-md-3 col-xl-3">
             <div class="card bg-c-gtx order-card">
-              <div class="card-block">
-                <h6 class="m-b-20">Registered Students </h6>
-                <h2 class="text-right"><i class="fas fa-user-graduate f-left"></i><span>{{total_student}}</span></h2>
-                
-              </div>
+                <div class="card-block">
+                    <h6 class="m-b-20">Registered Students</h6>
+                    <h2 class="text-right"><i class="fas fa-user-graduate f-left"></i><span>{{total_student}}</span></h2>
+                </div>
             </div>
-          </div>
-  
-      <div class="col-md-4 col-xl-4">
-        <div class="card bg-c-yellow order-card">
-          <div class="card-block">
-            <h6 class="m-b-20">Total Courses</h6>
-           <h2 class="text-right"><i class="fas fa-book f-left"></i><span>{{total_course}}</span></h2>
-            
-          </div>
         </div>
-      </div>
-  
-      <div class="col-md-4 col-xl-4">
-        <div class="card bg-c-blue order-card">
-          <div class="card-block">
-            <h6 class="m-b-20">Total Questions</h6>
-            <h2 class="text-right"><i class="fas fa-question-circle f-left"></i><span>{{total_question}}</span></h2>
-            
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
+        <div class="col-md-3 col-xl-3">
+            <div class="card bg-c-yellow order-card">
+                <div class="card-block">
+                    <h6 class="m-b-20">Total Courses</h6>
+                    <h2 class="text-right"><i class="fas fa-book f-left"></i><span>{{total_course}}</span></h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-xl-3">
+            <div class="card bg-c-blue order-card">
+                <div class="card-block">
+                    <h6 class="m-b-20">Total Questions</h6>
+                    <h2 class="text-right"><i class="fas fa-question-circle f-left"></i><span>{{total_question}}</span></h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Student Report Button -->
+        <div class="col-md-3 col-xl-3">
+            <a href="{% url 'student_report' %}" class="text-white">
+                <div class="card bg-c-green order-card">
+                    <div class="card-block">
+                        <h6 class="m-b-20">Student Report</h6>
+                        <h2 class="text-right"><i class="fas fa-chart-bar f-left"></i></h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
 
 <br><br><br><br><br><br><br><br><br><br>
 
 <script src="http://netdna.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
-
 
 {% endblock content %}

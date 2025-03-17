@@ -1,0 +1,59 @@
+{% extends 'teacher/teacherbase.html' %}
+
+{% block content %}
+<!-- Title Section -->
+<h2>Student Report</h2>
+
+<!-- Table Styling -->
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    th, td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+    th {
+        background-color: #f2f2f2;
+        color: #333;
+        font-weight: bold;
+    }
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    tr:hover {
+        background-color: #f1f1f1;
+    }
+    .container {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+</style>
+
+<!-- Container for the Report -->
+<div class="container">
+    <!-- Table for displaying student report -->
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Course Name</th>
+                <th>Marks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in student_reports %}
+            <tr>
+                <td>{{ report.student_name }}</td>
+                <td>{{ report.course_name }}</td>
+                <td>{{ report.marks }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -122,3 +122,28 @@ def remove_question_view(request,pk):
     question=QMODEL.Question.objects.get(id=pk)
     question.delete()
     return HttpResponseRedirect('/teacher/teacher-view-question')
+
+@login_required(login_url='teacherlogin')
+@user_passes_test(is_teacher)
+def student_report_view(request):
+    # Fetching all results with related student details
+    exam_results = QMODEL.Result.objects.all()  # Ensure you're using the correct model
+
+    # Prepare the student reports (student name and marks)
+    student_reports = []
+    for result in exam_results:
+        student_data = {
+            'student_name': result.student.get_name,  # Using the get_name method from the Student model
+            'marks': result.marks,
+            'course_name': result.exam.course_name,  # Get the course name from the result's associated course
+        }
+        student_reports.append(student_data)
+
+    # Pass this data to the template
+    context = {
+        'student_reports': student_reports
+    }
+    
+    return render(request, 'teacher/student_report.html', context)
+
+
