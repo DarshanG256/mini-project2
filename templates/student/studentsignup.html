@@ -4,64 +4,143 @@
   <head>
     <meta charset="utf-8">
     <style>
-
-        form{
-           margin: 50px; 
-          
+        form {
+           margin: 50px;
         }
 
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+
+        .password-strength {
+            font-size: 12px;
+        }
     </style>
+    <script>
+      // Function to validate phone number (only numbers, 10 digits)
+      function validatePhoneNumber() {
+        const phone = document.getElementById('mobile');
+        const phoneError = document.getElementById('phone-error');
+        const phonePattern = /^[0-9]{10}$/;
+
+        if (!phone.value.match(phonePattern)) {
+          phoneError.textContent = 'Please enter a valid 10-digit phone number.';
+          return false;
+        } else {
+          phoneError.textContent = '';
+          return true;
+        }
+      }
+
+      // Function to check password strength
+      function checkPasswordStrength() {
+        const password = document.getElementById('id_password');
+        const strengthMessage = document.getElementById('password-strength');
+        const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/; // At least 8 characters, at least 1 letter and 1 number
+
+        if (password.value.length < 8) {
+          strengthMessage.textContent = 'Password must be at least 8 characters long.';
+          strengthMessage.style.color = 'red';
+        } else if (!password.value.match(passwordPattern)) {
+          strengthMessage.textContent = 'Password must include at least one letter and one number.';
+          strengthMessage.style.color = 'red';
+        } else {
+          strengthMessage.textContent = 'Password is strong.';
+          strengthMessage.style.color = 'green';
+        }
+      }
+
+      // Function to validate names (letters only)
+      function validateName(fieldId, errorId) {
+        const nameField = document.getElementById(fieldId);
+        const nameError = document.getElementById(errorId);
+        const namePattern = /^[A-Za-z]+$/;
+
+        if (!nameField.value.match(namePattern)) {
+          nameError.textContent = 'Please enter a valid name with letters only.';
+          return false;
+        } else {
+          nameError.textContent = '';
+          return true;
+        }
+      }
+
+      // Validate the entire form
+      function validateForm(event) {
+        let valid = true;
+
+        if (!validatePhoneNumber()) valid = false;
+        if (!validateName('first_name', 'first-name-error')) valid = false;
+        if (!validateName('last_name', 'last-name-error')) valid = false;
+
+        return valid;
+      }
+    </script>
   </head>
   <body>
     {% include "exam/navbar.html" %}
- 
 
+    <br><br><br>
+    <div class="container">
+      <h3 style="text-align: center;">Student Signup Form</h3>
+      <form method="POST" autocomplete="off" enctype="multipart/form-data" onsubmit="return validateForm(event)">
+        {% csrf_token %}
 
-<br><br><br>
-<div class="container">
-  <h3 style="text-align: center;">Student Signup Form</h3>
-<form method="POST" autocomplete="off" enctype="multipart/form-data">
-    {% csrf_token %}
-
-    <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="first_name">First Name</label>
-          {% render_field userForm.first_name|attr:'required:true'  class="form-control" placeholder="First Name" %}
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="first_name">First Name</label>
+            <input type="text" name="first_name" id="first_name" class="form-control" placeholder="First Name" value="{{ userForm.first_name.value }}" required oninput="validateName('first_name', 'first-name-error')" />
+            <div id="first-name-error" class="error"></div>
+            {% if userForm.first_name.errors %}
+              <div class="error">{{ userForm.first_name.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group col-md-6">
+            <label for="last_name">Last Name</label>
+            <input type="text" name="last_name" id="last_name" class="form-control" placeholder="Last Name" value="{{ userForm.last_name.value }}" required oninput="validateName('last_name', 'last-name-error')" />
+            <div id="last-name-error" class="error"></div>
+            {% if userForm.last_name.errors %}
+              <div class="error">{{ userForm.last_name.errors }}</div>
+            {% endif %}
+          </div>
         </div>
-        <div class="form-group col-md-6">
-          <label for="last_name">Last Name</label>
-          {% render_field userForm.last_name|attr:'required:true'  class="form-control" placeholder="Last Name" %}
-        </div>
-      </div>
 
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="mobile">Contact</label>
-          {% render_field studentForm.mobile|attr:'required:true'  class="form-control" placeholder="Contact Number" %}
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="mobile">Contact</label>
+            <input type="text" name="mobile" id="mobile" class="form-control" placeholder="Contact Number" value="{{ studentForm.mobile.value }}" required oninput="validatePhoneNumber()" />
+            <div id="phone-error" class="error"></div>
+            {% if studentForm.mobile.errors %}
+              <div class="error">{{ studentForm.mobile.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group col-md-6">
+            <label for="address">Address</label>
+            <input type="text" name="address" id="address" class="form-control" placeholder="Address" value="{{ studentForm.address.value }}" required />
+          </div>
         </div>
-        <div class="form-group col-md-6">
-          <label for="address">Address</label>
-          {% render_field studentForm.address|attr:'required:true'  class="form-control" placeholder="Address" %}
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" class="form-control" placeholder="Username" value="{{ userForm.username.value }}" required />
+          </div>
+          <div class="form-group col-md-6">
+            <label for="inputPassword4">Password</label>
+            <input type="password" name="password" id="id_password" class="form-control" placeholder="Password" value="{{ userForm.password.value }}" required oninput="checkPasswordStrength()" />
+            <div id="password-strength" class="password-strength"></div>
+            {% if userForm.password.errors %}
+              <div class="error">{{ userForm.password.errors }}</div>
+            {% endif %}
+          </div>
         </div>
-      </div>
 
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="username">Username</label>
-          {% render_field userForm.username|attr:'required:true'  class="form-control" placeholder="username" %}
-        </div>
-        <div class="form-group col-md-6">
-          <label for="inputPassword4">Password</label>
-          {% render_field userForm.password|attr:'required:true'  class="form-control" placeholder="password" %}
-        </div>
-      </div>
+        <button type="submit" class="btn btn-success" style="border-radius: 0%;">Sign Up</button>
+      </form>
+    </div>
 
-    <button type="submit" class="btn btn-success" style="border-radius: 0%;">Sign Up</button>
-  </form>
-</div>
-
-
-<br><br>
-{% include "exam/footer.html" %}
+    <br><br>
+    {% include "exam/footer.html" %}
   </body>
 </html>
