@@ -13,6 +13,26 @@ from student import models as SMODEL
 from teacher import forms as TFORM
 from student import forms as SFORM
 from django.contrib.auth.models import User
+import cv2
+import numpy as np
+import base64
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+@csrf_exempt
+def face_monitoring(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        img_data = data['image'].split(',')[1]
+        nparr = np.frombuffer(base64.b64decode(img_data), np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+
+        return JsonResponse({'face_detected': len(faces) > 0})
 
 
 
