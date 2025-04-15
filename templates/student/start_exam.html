@@ -11,14 +11,16 @@
     body {
       background-color: #f7f7f7;
     }
+
     .jumbotron {
       padding: 50px;
       background-color: #dff0d8;
     }
+
     #videoPreview {
       position: fixed;
-      top: 20px;
-      right: 20px;
+      bottom: 20px;
+      left: 20px;
       border: 3px solid #444;
       z-index: 999;
       width: 200px;
@@ -27,29 +29,26 @@
   </style>
 
   <script>
+    // Fullscreen on load
     function enterFullscreen() {
-      var docElm = document.documentElement;
-      if (docElm.requestFullscreen) {
-        docElm.requestFullscreen();
-      } else if (docElm.mozRequestFullScreen) {
-        docElm.mozRequestFullScreen();
-      } else if (docElm.webkitRequestFullscreen) {
-        docElm.webkitRequestFullscreen();
-      } else if (docElm.msRequestFullscreen) {
-        docElm.msRequestFullscreen();
-      }
+      const docElm = document.documentElement;
+      if (docElm.requestFullscreen) docElm.requestFullscreen();
+      else if (docElm.mozRequestFullScreen) docElm.mozRequestFullScreen();
+      else if (docElm.webkitRequestFullscreen) docElm.webkitRequestFullscreen();
+      else if (docElm.msRequestFullscreen) docElm.msRequestFullscreen();
     }
 
-    window.onload = function() {
-      setTimeout(() => enterFullscreen(), 1000);
-      document.body.addEventListener('click', () => enterFullscreen());
+    window.onload = () => {
+      setTimeout(enterFullscreen, 1000);
+      document.body.addEventListener('click', enterFullscreen);
     };
 
+    // Disable right-click and copy
     document.addEventListener("contextmenu", e => e.preventDefault());
     document.addEventListener("copy", e => e.preventDefault());
 
+    // Tab switch warning
     alert("Please don't switch tabs. You can switch tabs a maximum of 2 times.");
-
     let tabSwitchCount = 0;
     const maxTabSwitches = 2;
 
@@ -57,7 +56,7 @@
       if (document.hidden) {
         tabSwitchCount++;
         if (tabSwitchCount < maxTabSwitches) {
-          alert("Warning: You switched tabs!");
+          alert(`Warning: You switched tabs! (${tabSwitchCount}/${maxTabSwitches})`);
         }
         if (tabSwitchCount >= maxTabSwitches) {
           alert("You switched tabs 3 times. Exam is locked.");
@@ -69,18 +68,24 @@
       }
     });
 
+    // Face violation logic
+    let faceViolationCount = 0;
+    const maxFaceViolations = 3;
+
     function disableExam() {
-      let inputs = document.querySelectorAll('input');
+      const inputs = document.querySelectorAll('input');
       inputs.forEach(input => input.disabled = true);
-      let submitButton = document.querySelector('input[type="submit"]');
-      submitButton.disabled = true;
-      submitButton.value = "Exam Locked - You cannot continue!";
-      alert("The exam has been locked due to multiple tab switches.");
+      const submitButton = document.querySelector('input[type="submit"]');
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.value = "Exam Locked - You cannot continue!";
+      }
     }
 
+    // Save answers in cookies
     function saveAns() {
-      var ele = document.getElementsByTagName('input');
-      for (i = 0; i < ele.length; i++) {
+      const ele = document.getElementsByTagName('input');
+      for (let i = 0; i < ele.length; i++) {
         if (ele[i].type === "radio" && ele[i].checked) {
           setCookie(ele[i].name, ele[i].value, 3);
         }
@@ -88,14 +93,14 @@
     }
 
     function setCookie(cname, cvalue, exdays) {
-      var d = new Date();
+      const d = new Date();
       d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-      var expires = "expires=" + d.toUTCString();
+      const expires = "expires=" + d.toUTCString();
       document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
     }
 
     function handleFormSubmit(event) {
-      if (tabSwitchCount >= maxTabSwitches) {
+      if (tabSwitchCount >= maxTabSwitches || faceViolationCount >= maxFaceViolations) {
         event.preventDefault();
         alert("The exam has been locked. You cannot submit any more answers.");
       }
@@ -106,7 +111,7 @@
       form.addEventListener('submit', handleFormSubmit);
     });
 
-    // Face monitoring using webcam
+    // Webcam preview and face tracking
     let video = document.createElement("video");
     video.setAttribute("id", "videoPreview");
     video.autoplay = true;
@@ -119,7 +124,7 @@
       .then(stream => {
         video.srcObject = stream;
       })
-      .catch(error => {
+      .catch(() => {
         alert("Webcam access denied. Face monitoring won't work.");
       });
 
@@ -141,13 +146,21 @@
         .then(response => response.json())
         .then(data => {
           if (!data.face_detected) {
-            alert("⚠️ Face not detected. Please stay in front of your webcam.");
+            faceViolationCount++;
+            if (faceViolationCount < maxFaceViolations) {
+              alert(`⚠️ Face not detected! Warning ${faceViolationCount}/${maxFaceViolations}`);
+            }
+            if (faceViolationCount >= maxFaceViolations) {
+              alert("❌ Face not detected multiple times. Exam is now locked.");
+              disableExam();
+            }
           }
         });
       }
     }
 
-    setInterval(sendFaceSnapshot, 10000);  // Every 10 seconds
+    // Send snapshot every 10 seconds
+    setInterval(sendFaceSnapshot, 10000);
   </script>
 </head>
 
